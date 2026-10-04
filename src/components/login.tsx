@@ -1,13 +1,14 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { loginUser } from '../services/loginUser';
-import type { AuthUser, LoginErrors } from '../types/auth';
+import type { AuthUser, LoginErrors, LoggedInUser } from '../types/auth';
 import Swal from "sweetalert2";
  
-type RegisterProps = {
-  setView: (view: "index" | "login" | "register") => void;
+type LoginProps = {
+  setView: (view: "index") => void,
+  onLoginSuccess: (user: LoggedInUser) => void,
 };
 
-function Login({setView}:RegisterProps){
+function Login({setView, onLoginSuccess,}:LoginProps){
     const [formLogin, setFormLogin] = useState<AuthUser>({
         email: "",
         password: ""
@@ -57,7 +58,7 @@ function Login({setView}:RegisterProps){
         
         try {
             const user = await loginUser(formLogin);
-            console.log("Sesión iniciada: ", user);
+            onLoginSuccess(user);
         }catch (error) {
             if (error instanceof Error) {
                 Swal.fire(

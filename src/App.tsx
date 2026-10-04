@@ -1,9 +1,33 @@
 import { useState } from "react";
 import Login from "./components/login";
 import Register from "./components/register";
+import DashBoard from "./components/dashBoard";
+import { getSessionUser, logoutUser } from './services/loginUser'
+import type { LoggedInUser } from './types/auth'
 
 function App() {
+
+  const [sessionUser, setSessionUser] = useState<LoggedInUser | null>(
+    ()=> getSessionUser()
+  );
+
   const [view,setView]=useState<"index" | "login" | "register">("index");
+
+  const handleLoginSuccess = (user: LoggedInUser) => {
+    setSessionUser(user);
+  }
+
+  const handleLogout = () => {
+    logoutUser();
+    setSessionUser(null);
+    setView('index');
+  }
+
+  if(sessionUser){
+    return (
+      <DashBoard user={sessionUser} onLogout={handleLogout}></DashBoard>
+    )
+  }
 
   return (
     <div className="min-h-screen p-5 bg-linear-to-br from-[#5A3825] via-[#8A5A3B] to-[#C79A6B]">
@@ -26,13 +50,13 @@ function App() {
 
         {view === "login" && (
           <div className="fade-in">
-            <Login setView={setView}/>
+            <Login onLoginSuccess={handleLoginSuccess} setView={setView}/>
           </div>
         )}
 
         {view === "register" && (
           <div className="fade-in">
-            <Register setView={setView} />
+            <Register onLoginSuccess={handleLoginSuccess} setView={setView} />
           </div>
         )}
     </div>

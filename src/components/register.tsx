@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import type {RegisterData, RegisterErrors} from "../types/auth";
+import type {RegisterData, RegisterErrors, LoggedInUser} from "../types/auth";
 import { userRegister } from '../services/registerUser';
 import Swal from "sweetalert2";
 
 type RegisterProps = {
-  setView: (view: "index" | "login" | "register") => void;
+    setView: (view: "index") => void;
+    onLoginSuccess : (user: LoggedInUser) => void;
 };
 
-function Register({setView}:RegisterProps){
+function Register({setView, onLoginSuccess,}:RegisterProps){
 
     const [registerData, setRegisterData] = useState<RegisterData>({
         name : "",
@@ -85,12 +86,13 @@ function Register({setView}:RegisterProps){
         }
 
         try{
-            await userRegister(registerData);
-            Swal.fire(
+            const user = await userRegister(registerData);
+            await Swal.fire(
                 "¡Cuenta creada!",
                 "La cuenta se registro exitosamente.",
                 "success",
             );
+            onLoginSuccess (user);
         }catch(error){
             if (error instanceof Error) {
                 Swal.fire(
