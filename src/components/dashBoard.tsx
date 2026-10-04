@@ -1,5 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { LoggedInUser } from "../types/auth";
+import DepositCash from "./DashBoard/depositCash";
+import BarGraph from "./DashBoard/barGraph";
+import DonutGraph from "./DashBoard/donutGraph";
+import HomeDashBoard from './DashBoard/homeDashBoard'
 
 interface DashboardProps{
     user: LoggedInUser,
@@ -12,6 +16,30 @@ function DashBoard({
     }: DashboardProps){
 
     const [menu, setMenu] = useState(false);
+    const [viewMain, setViewMain] = useState <
+        "homeDashBoard" |
+        'donutGraph' |
+        "barGraph" |
+        "depositCash"
+        >("homeDashBoard");
+
+    const handleSelectOption = (
+        option: 'donutGraph' | "barGraph" | "depositCash"
+    ) => {
+        setViewMain(option);
+        window.history.pushState(null, "");
+    };
+
+    useEffect(() => {
+        const handleBack = () =>{
+            setViewMain("homeDashBoard");
+        };
+
+        window.addEventListener('popstate', handleBack);
+        return () => {
+            window.removeEventListener("popstate", handleBack);
+        }
+    }, []);
 
     return(
         <div className="min-h-screen bg-linear-to-br from-[#6b4226] via-[#9a6845] to-[#d1a77d]">
@@ -50,54 +78,12 @@ function DashBoard({
             </header>
 
             <main className="mx-auto max-w-6xl px-6 py-10">
-                <div className="mb-12">
-                    <h2 className="text-3xl font-bold text-emerald-50">
-                        ¡Bienvenid@, {user.name}! 👋
-                    </h2>
-                    <p className="mt-2 text-white text-xl font-mono">
-                        Selecciona una opción para comenzar.
-                    </p>
-                </div>
 
-                <div className="grid gap-6 md:grid-cols-3">
+                {viewMain ==="homeDashBoard" && <HomeDashBoard user={user} onSelectOption={handleSelectOption}/>}
+                {viewMain ==="donutGraph" && <DonutGraph/>}
+                {viewMain ==="barGraph" && <BarGraph/>}
+                {viewMain ==="depositCash" && <DepositCash/>}
 
-                    <button className="group rounded-2xl border border-gray-200 bg-white p-6 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-                        <div className="mb-4 text-7xl text-center">
-                            📊
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-800">
-                            Grafica Ganadas/Perdidas
-                        </h3>
-                        <p className="mt-2 text-sm text-gray-500">
-                            Detalle de las apuestas ganadas y perdidas totales.
-                        </p>
-                    </button>
-
-                    <button className="group rounded-2xl border border-gray-200 bg-white p-6 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-                        <div className="mb-4 text-7xl text-center">
-                            📈
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-800">
-                            Victoria Por Caracol
-                        </h3>
-                        <p className="mt-2 text-sm text-gray-500">
-                            Detalle de las victorias obtenidas de cada caracol.
-                        </p>
-                    </button>
-
-                    <button className="group rounded-2xl border border-gray-200 bg-white p-6 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-                        <div className="mb-4 text-6xl font-bold">
-                            💰 ${user.cash}
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-800">
-                            Cargar Cash para apuestas
-                        </h3>
-                        <p className="mt-2 text-sm text-gray-500">
-                            Cargar dinero para proximas apuestas.
-                        </p>
-                    </button>
-
-                </div>
             </main>
         </div>
     )
