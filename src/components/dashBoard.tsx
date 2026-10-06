@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import type { LoggedInUser } from "../types/auth";
-import DepositCash from "./DashBoard/depositCash";
-import BarGraph from "./DashBoard/barGraph";
-import DonutGraph from "./DashBoard/donutGraph";
+import SnailPayForm from "./DashBoard/snailPayForm";
 import HomeDashBoard from './DashBoard/homeDashBoard'
 
 interface DashboardProps{
@@ -18,13 +16,11 @@ function DashBoard({
     const [menu, setMenu] = useState(false);
     const [viewMain, setViewMain] = useState <
         "homeDashBoard" |
-        'donutGraph' |
-        "barGraph" |
         "depositCash"
         >("homeDashBoard");
 
     const handleSelectOption = (
-        option: 'donutGraph' | "barGraph" | "depositCash"
+        option: "depositCash"
     ) => {
         setViewMain(option);
         window.history.pushState(null, "");
@@ -77,12 +73,10 @@ function DashBoard({
                 </div>
             </header>
 
-            <main className="mx-auto max-w-6xl px-6 py-10">
+            <main className="w-full px-6 py-10">
 
                 {viewMain ==="homeDashBoard" && <HomeDashBoard user={user} onSelectOption={handleSelectOption}/>}
-                {viewMain ==="donutGraph" && <DonutGraph/>}
-                {viewMain ==="barGraph" && <BarGraph/>}
-                {viewMain ==="depositCash" && <DepositCash/>}
+                {viewMain ==="depositCash" && <SnailPayForm/>}
 
             </main>
         </div>

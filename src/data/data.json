@@ -1,0 +1,26 @@
+{
+    "snails": [
+        {"id": 1, "nameSnail": "Gary"},
+        {"id": 2, "nameSnail": "Turbo"},
+        {"id": 3, "nameSnail": "Rocky"},
+        {"id": 4, "nameSnail": "Speedy"},
+        {"id": 5, "nameSnail": "Escargoon"},
+        {"id": 6, "nameSnail": "Estibilis"}
+    ],
+    "racing": [
+        {"id": 1, "time": "9:00", "idWinner": 1},
+        {"id": 2, "time": "13:00","idWinner": 4},
+        {"id": 3, "time": "15:00", "idWinner": 5},
+        {"id": 4, "time": "18:00", "idWinner": 1},
+        {"id": 5, "time": "21:00", "idWinner": 5},
+        {"id": 6, "time": "23:00", "idWinner": 3}
+    ],
+    "bets": [
+        {"idRacing": 1, "idSnail": 1, "amount": 100, "share": 2.5},
+        {"idRacing": 2, "idSnail": 1, "amount": 100, "share": 3.0},
+        {"idRacing": 3, "idSnail": 6, "amount": 50, "share": 4.0},
+        {"idRacing": 4, "idSnail": 1, "amount": 100, "share": 1.5},
+        {"idRacing": 5, "idSnail": 5, "amount": 500, "share": 6.0},
+        {"idRacing": 6, "idSnail": 3, "amount": 200, "share": 2.8}
+    ]
+}
