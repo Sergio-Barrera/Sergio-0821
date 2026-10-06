@@ -8,14 +8,6 @@ const racing: Racing[] = data.racing;
 
 const values: WinnersLossers[]=snailVictories(sanils, racing);
 console.log(values);
-const COLORS = [
-    '#492f2f',
-    '#290404',
-    '#201b3a',
-    '#1d0a15',
-    '#5e0e0e',
-    '#041f06'
-];
 
 function BarGraph(){
     return (

@@ -76,7 +76,7 @@ function DashBoard({
             <main className="w-full px-6 py-10">
 
                 {viewMain ==="homeDashBoard" && <HomeDashBoard user={user} onSelectOption={handleSelectOption}/>}
-                {viewMain ==="depositCash" && <SnailPayForm/>}
+                {viewMain ==="depositCash" && <SnailPayForm user={user}/>}
 
             </main>
         </div>

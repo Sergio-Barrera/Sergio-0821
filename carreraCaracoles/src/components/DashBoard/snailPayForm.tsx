@@ -1,106 +1,107 @@
 import React, { useState } from 'react';
+//import {createPayment} from '../../services/SnailPay'
+import type { PaymentFormData, PaySnileRequest } from '../../types/typePayment'
+import type { LoggedInUser } from '../../types/auth'
+import Swal from 'sweetalert2';
 
-// Interfaz para el estado del formulario
-interface PaymentFormData {
-  cardNumber: string;
-  cardExpiry: string;
-  cardCvv: string;
-  amount: string;
-}
+type SnailPayProps = {
+    user: LoggedInUser
+};
 
-function SnailPayForm (){
+function SnailPayForm ({user}:SnailPayProps){
   const [formData, setFormData] = useState<PaymentFormData>({
     cardNumber: '',
+    nameUser: '',
     cardExpiry: '',
     cardCvv: '',
     amount: '',
   });
 
   const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const [apiSuccess, setApiSuccess] = useState<string | null>(null);
 
-  // Manejador de cambios generales y máscaras de entrada
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
+    const {id, value} = e.target;
 
     if (id === 'cardNumber') {
-      // Solo números, máx 16 dígitos
       const cleanValue = value.replace(/\D/g, '').slice(0, 16);
       setFormData((prev) => ({ ...prev, cardNumber: cleanValue }));
-    } else if (id === 'cardExpiry') {
-      // Máscara automática para MM/AA
+    }else if (id === 'nameUser') {
+      let cleanValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '');
+      setFormData((prev) => ({ ...prev, nameUser: cleanValue.slice(0, 100) }));
+    }else if (id === 'cardExpiry') {
       let cleanValue = value.replace(/\D/g, '');
+      if (cleanValue.length >= 1) {
+        const firstDigit = parseInt(cleanValue[0], 10);
+        if (firstDigit > 1) {
+          cleanValue = `0${firstDigit}`;
+        }
+      }
+      if (cleanValue.length >= 2) {
+        const month = parseInt(cleanValue.slice(0, 2), 10);
+        if (month > 12) {
+          cleanValue = `12${cleanValue.slice(2)}`;
+        }
+      }
       if (cleanValue.length > 2) {
         cleanValue = `${cleanValue.slice(0, 2)}/${cleanValue.slice(2, 4)}`;
       }
       setFormData((prev) => ({ ...prev, cardExpiry: cleanValue.slice(0, 5) }));
     } else if (id === 'cardCvv') {
-      // Solo números, máx 3 dígitos
       const cleanValue = value.replace(/\D/g, '').slice(0, 3);
       setFormData((prev) => ({ ...prev, cardCvv: cleanValue }));
     } else if (id === 'amount') {
-      // Permitir números y un punto decimal
       const cleanValue = value.replace(/[^0-9.]/g, '');
       setFormData((prev) => ({ ...prev, amount: cleanValue }));
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePayment= async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setApiError(null);
-    setApiSuccess(null);
 
-    try {
-      // Conexión ficticia/real a tu API de Express
-      const response = await fetch('http://localhost:3000/api/v1/charges', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cardNumber: formData.cardNumber,
-          cardExpiry: formData.cardExpiry,
-          cardCvv: formData.cardCvv,
-          amount: parseFloat(formData.amount),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Captura errores 400 (Zod / Inválidos) o 402 (Incorrectos / Fondos o Expirados)
-        throw new Error(data.message || data.failure_message || 'Error al procesar el pago');
+    try{
+      const userData = { idUser: user.id, email:user.email }
+      const payment: PaySnileRequest = {
+        idUser: userData.idUser,
+        email: userData.email,
+        amount: Number(formData.amount),
+        card: {
+          number: formData.cardNumber,
+          expiredCard: formData.cardExpiry,
+          cvv: formData.cardCvv,
+          NameUserCar: formData.nameUser,
+        }
       }
 
-      setApiSuccess(`¡Pago procesado con éxito! ID: ${data.id}`);
-      setFormData({ cardNumber: '', cardExpiry: '', cardCvv: '', amount: '' }); // Limpiar formulario
-    } catch (error: any) {
-      setApiError(error.message || 'Ocurrió un error inesperado');
-    } finally {
+      //const resultPay = await createPayment(payment);
+      console.log(payment);
+
+      await Swal.fire(
+          "¡Cuenta creada!",
+          "La cuenta se registro exitosamente.",
+          "success",
+      );
+    }catch(error){
+      if (error instanceof Error) {
+        Swal.fire(
+          "Email registrado",
+          error.message,
+          "warning",
+        );
+      }
+    }finally{
       setLoading(false);
     }
-  };
-
+  }
+  
   return (
     <div className="flex items-center justify-center min-h-scree">
-      <div className="w-full max-w-5xl p-6 bg-slate-800/40 backdrop-blur-md rounded-2xl shadow-xl border border-slate-700">
+      <div className="w-full max-w-5xl p-6 bg-[#5A3825]/40 backdrop-blur-md rounded-2xl shadow-xl border border-slate-700">
         
         <div className="flex flex-col items-center justify-center mb-6">
           <h2 className="text-xl font-bold text-white tracking-wide">INGRESA TUS DATOS PARA HACER RECARGA</h2>
         </div>
 
-        {apiError && (
-          <div className="p-3 mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg">
-            ⚠️ {apiError}
-          </div>
-        )}
-        {apiSuccess && (
-          <div className="p-3 mb-4 text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-            🎉 {apiSuccess}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handlePayment} className="space-y-4">
           
           <div className="flex flex-col gap-1.5">
             <label htmlFor="cardNumber" className="text-sm font-medium text-slate-300">
@@ -121,16 +122,18 @@ function SnailPayForm (){
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="cardNumber" className="text-sm font-medium text-slate-300">
+            <label htmlFor="nameUser" className="text-sm font-medium text-slate-300">
               Nombre de propietario
             </label>
             <div className="relative">
               <input
                 type="text"
-                id="nombreCard"
+                id="nameUser"
                 required
+                minLength={3}
+                maxLength={100}
                 placeholder="Juan Dominguez Chaves"
-                value={formData.cardNumber}
+                value={formData.nameUser}
                 onChange={handleInputChange}
                 className="w-full pl-4 pr-10 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors tracking-widest"
               />
@@ -189,7 +192,6 @@ function SnailPayForm (){
           </div>
 
           <button
-            type="submit"
             disabled={loading}
             className="w-full mt-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/20 transition-all duration-200 focus:outline-none"
           >
