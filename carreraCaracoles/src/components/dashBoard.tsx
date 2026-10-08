@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import type { LoggedInUser } from "../types/auth";
+import type { TransactionResponse } from "../types/typePayment";
 import SnailPayForm from "./DashBoard/snailPayForm";
-import HomeDashBoard from './DashBoard/homeDashBoard'
+import HomeDashBoard from './DashBoard/homeDashBoard';
+import PaymentReceipt from './paymentReceipt';
 
 interface DashboardProps{
     user: LoggedInUser,
@@ -14,9 +16,12 @@ function DashBoard({
     }: DashboardProps){
 
     const [menu, setMenu] = useState(false);
+    const [receiptData, setReceiptData] = useState<TransactionResponse | null>(null);
+    
     const [viewMain, setViewMain] = useState <
         "homeDashBoard" |
-        "depositCash"
+        "depositCash" |
+        "receipt"
         >("homeDashBoard");
 
     const handleSelectOption = (
@@ -75,8 +80,31 @@ function DashBoard({
 
             <main className="w-full px-6 py-10">
 
-                {viewMain ==="homeDashBoard" && <HomeDashBoard user={user} onSelectOption={handleSelectOption}/>}
-                {viewMain ==="depositCash" && <SnailPayForm user={user}/>}
+                {viewMain ==="homeDashBoard" &&
+                    <HomeDashBoard
+                        user = {user}
+                        onSelectOption = {handleSelectOption}
+                    />}
+                
+                {viewMain === "depositCash" && (
+                    <SnailPayForm
+                        user={user} 
+                        onPayStatus={(data) => {
+                            setReceiptData(data);
+                            setViewMain('receipt');
+                        }}
+                    />
+                )}
+
+                {viewMain === "receipt" && receiptData && (
+                    <PaymentReceipt
+                        data={receiptData}
+                        onAccept={() => {
+                            setReceiptData(null);
+                            setViewMain("homeDashBoard");
+                        }}
+                    />
+                )}
 
             </main>
         </div>

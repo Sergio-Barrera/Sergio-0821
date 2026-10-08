@@ -22,10 +22,16 @@ export interface TransactionResponse {
     id: string,
     status: string,
     status_detail: string,
-    transaction_amoun: number,
-    date_create: String,
+    transaction_amount: number,
+    date_create: string,
     authorization_code: string | null,
     reference: string,
     payer_id: string,
     payer_email: string
 }
+
+export type ResponsePayment = {
+    true: boolean,
+    message: string,
+    data: TransactionResponse
+};

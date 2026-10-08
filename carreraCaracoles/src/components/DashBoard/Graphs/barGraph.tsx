@@ -7,7 +7,6 @@ const sanils: Snail[] = data.snails;
 const racing: Racing[] = data.racing;
 
 const values: WinnersLossers[]=snailVictories(sanils, racing);
-console.log(values);
 
 function BarGraph(){
     return (

@@ -69,7 +69,7 @@ function createTransaction(request: createPaymentInput, status: Transaction["sta
         id: `pay_${randomUUID()}`,
         status,
         status_detail: statusDetail,
-        transaction_amoun: request.amount,
+        transaction_amount: request.amount,
         date_create: new Date().toISOString(),
         authorization_code: status === "approved" ? `AUTH_${Math.random().toString(36).slice(2,10).toUpperCase()}` : null,
         reference: `Cargo apuesta caracoles ${request.card.NameUserCar}`,

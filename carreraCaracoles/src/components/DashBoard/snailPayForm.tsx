@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-//import {createPayment} from '../../services/SnailPay'
-import type { PaymentFormData, PaySnileRequest } from '../../types/typePayment'
+import {createPayment} from '../../services/SnailPay'
+import type { PaymentFormData, PaySnileRequest, TransactionResponse } from '../../types/typePayment'
 import type { LoggedInUser } from '../../types/auth'
 import Swal from 'sweetalert2';
 
 type SnailPayProps = {
-    user: LoggedInUser
+    user: LoggedInUser,
+    onPayStatus: (data: TransactionResponse) => void;
 };
 
-function SnailPayForm ({user}:SnailPayProps){
+function SnailPayForm ({user, onPayStatus}:SnailPayProps){
   const [formData, setFormData] = useState<PaymentFormData>({
     cardNumber: '',
     nameUser: '',
@@ -58,32 +59,48 @@ function SnailPayForm ({user}:SnailPayProps){
   const handlePayment= async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try{
-      const userData = { idUser: user.id, email:user.email }
-      const payment: PaySnileRequest = {
-        idUser: userData.idUser,
-        email: userData.email,
-        amount: Number(formData.amount),
-        card: {
-          number: formData.cardNumber,
-          expiredCard: formData.cardExpiry,
-          cvv: formData.cardCvv,
-          NameUserCar: formData.nameUser,
-        }
+    const result = await Swal.fire({
+      title: "¿Confirmar transacción?",
+      text: "¿Estás seguro de que deseas realizar esta transacción?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, confirmar",
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
+    });
+
+    if(!result.isConfirmed){
+      return;
+    }
+
+    const userData = { idUser: user.id, email:user.email }
+    const payment: PaySnileRequest = {
+      idUser: userData.idUser,
+      email: userData.email,
+      amount: Number(formData.amount),
+      card: {
+        number: formData.cardNumber,
+        expiredCard: formData.cardExpiry,
+        cvv: formData.cardCvv,
+        NameUserCar: formData.nameUser,
       }
+    }
 
-      //const resultPay = await createPayment(payment);
-      console.log(payment);
-
+    try{
+      const resultPay = await createPayment(payment);
+      console.log(resultPay)
       await Swal.fire(
-          "¡Cuenta creada!",
-          "La cuenta se registro exitosamente.",
+         `Saldo cargado $${resultPay.data.transaction_amount}`,
+          resultPay.message,
           "success",
       );
+
+      onPayStatus(resultPay.data);
+
     }catch(error){
       if (error instanceof Error) {
         Swal.fire(
-          "Email registrado",
+          "ERROR Transacción",
           error.message,
           "warning",
         );

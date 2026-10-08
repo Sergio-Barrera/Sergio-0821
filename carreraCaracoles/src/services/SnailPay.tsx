@@ -1,8 +1,8 @@
-/*import type { PaySnileRequest } from '../types/typePayment'
+import type { PaySnileRequest, ResponsePayment } from '../types/typePayment'
 
 export const createPayment = async (
     payment: PaySnileRequest
-): Promise<PaymentResponse> =>{
+): Promise<ResponsePayment> =>{
     const response = await fetch(
         "http://localhost:3000/api/payments",
         {
@@ -17,9 +17,9 @@ export const createPayment = async (
 
     if (!response.ok) {
         throw new Error(
-            data.message ?? "No fue posible realizar el pago."
+            data.error.message ?? "No fue posible realizar el pago."
         );
     }
 
     return data;
-}*/
+}

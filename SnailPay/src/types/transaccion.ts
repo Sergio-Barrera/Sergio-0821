@@ -4,7 +4,7 @@ export interface Transaction {
     id: string,
     status: string,
     status_detail: string,
-    transaction_amoun: number,
+    transaction_amount: number,
     date_create: String,
     authorization_code: string | null,
     reference: string,
