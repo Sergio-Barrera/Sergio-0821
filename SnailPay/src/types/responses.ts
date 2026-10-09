@@ -25,7 +25,7 @@ export interface ResponseError{
     error: {
         code: ErrorCode,
         message: string,
-        datails?: unknown,
+        details?: unknown,
     }
 }
 
@@ -38,14 +38,14 @@ export function succes<T>(data: T, message="OK"): ResponseSucces<T>{
 export function error(
     code: ErrorCode,
     message: string,
-    datails?: unknown,
+    details?: unknown,
 ): ResponseError{
     return {
         succes: false,
         error:{
             code,
             message,
-            ...(datails != undefined && {datails}),
+            ...(details != undefined && {details}),
         }
     }
 }

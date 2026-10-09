@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {createPayment} from '../../services/SnailPay'
+import { createPayment, PaymentError } from '../../services/SnailPay'
 import type { PaymentFormData, PaySnileRequest, TransactionResponse } from '../../types/typePayment'
 import type { LoggedInUser } from '../../types/auth'
 import Swal from 'sweetalert2';
@@ -86,6 +86,8 @@ function SnailPayForm ({user, onPayStatus}:SnailPayProps){
       }
     }
 
+      setLoading(true);
+
     try{
       const resultPay = await createPayment(payment);
       console.log(resultPay)
@@ -98,15 +100,21 @@ function SnailPayForm ({user, onPayStatus}:SnailPayProps){
       onPayStatus(resultPay.data);
 
     }catch(error){
-      if (error instanceof Error) {
-        Swal.fire(
-          "ERROR Transacción",
+      if (error instanceof PaymentError && error.transaction) {
+        await Swal.fire(
+          "ERROR durante la Transacción",
+          error.message,
+          "error",
+        );
+        onPayStatus(error.transaction);
+      }else if(error instanceof Error){
+        await Swal.fire(
+          "ERROR",
           error.message,
           "warning",
         );
+        setLoading(false);
       }
-    }finally{
-      setLoading(false);
     }
   }
   

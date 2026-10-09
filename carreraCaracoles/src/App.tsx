@@ -11,6 +11,10 @@ function App() {
     ()=> getSessionUser()
   );
 
+  const handleUserUpdate = (user: LoggedInUser) => {
+    setSessionUser(user);
+  }
+
   const [view,setView]=useState<"index" | "login" | "register">("index");
 
   const handleLoginSuccess = (user: LoggedInUser) => {
@@ -25,7 +29,7 @@ function App() {
 
   if(sessionUser){
     return (
-      <DashBoard user={sessionUser} onLogout={handleLogout}></DashBoard>
+      <DashBoard user={sessionUser} onLogout={handleLogout} onUserUpdate={handleUserUpdate}></DashBoard>
     )
   }
 

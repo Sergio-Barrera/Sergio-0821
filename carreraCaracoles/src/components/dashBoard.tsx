@@ -4,15 +4,18 @@ import type { TransactionResponse } from "../types/typePayment";
 import SnailPayForm from "./DashBoard/snailPayForm";
 import HomeDashBoard from './DashBoard/homeDashBoard';
 import PaymentReceipt from './paymentReceipt';
+import { UpdateAmount } from "../services/SnailPay";
 
 interface DashboardProps{
     user: LoggedInUser,
     onLogout: () =>void,
+    onUserUpdate: (user: LoggedInUser) => void,
 }
 
 function DashBoard({
         user,
         onLogout,
+        onUserUpdate,
     }: DashboardProps){
 
     const [menu, setMenu] = useState(false);
@@ -90,6 +93,10 @@ function DashBoard({
                     <SnailPayForm
                         user={user} 
                         onPayStatus={(data) => {
+                            if(data.status == "approved"){
+                                const updateUser = UpdateAmount(user.id, data.transaction_amount);
+                                onUserUpdate(updateUser);
+                            }
                             setReceiptData(data);
                             setViewMain('receipt');
                         }}

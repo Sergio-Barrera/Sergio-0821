@@ -1,4 +1,4 @@
-export type TransactionState = "approved" | "reject" |"in_process";
+export type TransactionState = "approved" | "rejected" |"in_process";
 
 export interface Transaction {
     id: string,

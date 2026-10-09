@@ -9,7 +9,7 @@ export const getUsers = (): DataBase[] => {
     return users ? JSON.parse(users) : [];
 }
 
-const saveUser = (user: DataBase[]) => {
+export const saveUser = (user: DataBase[]) => {
     localStorage.setItem(USERS_KEY,JSON.stringify(user));
 }
 
